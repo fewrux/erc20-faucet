@@ -24,13 +24,13 @@ contract('ProtoCoin', function (accounts) {
   });
 
   it("should return correct total supply", async () => {
-    const TOTAL_SUPPLY = new BN(1000).mul(new BN(10).pow(DECIMALS))
+    const TOTAL_SUPPLY = new BN(10000000).mul(new BN(10).pow(DECIMALS))
     const totalSupply = await contract.totalSupply()
     assert(totalSupply.eq(TOTAL_SUPPLY), 'Incorrect total supply')
   });
 
   it("owner should have total supply", async () => {
-    const TOTAL_SUPPLY = new BN(1000).mul(new BN(10).pow(DECIMALS))
+    const TOTAL_SUPPLY = new BN(10000000).mul(new BN(10).pow(DECIMALS))
     const ownerBalance = await contract.balanceOf(accounts[0])
     assert(ownerBalance.eq(TOTAL_SUPPLY), 'Incorrect owner balance')
   });
@@ -51,7 +51,7 @@ contract('ProtoCoin', function (accounts) {
   });
 
   it("should NOT transfer", async () => {
-    const transferAmount = new BN(1001).mul(new BN(10).pow(DECIMALS))
+    const transferAmount = new BN(10000001).mul(new BN(10).pow(DECIMALS))
 
     try {
       await contract.transfer(accounts[1], transferAmount)
@@ -109,6 +109,20 @@ contract('ProtoCoin', function (accounts) {
     const balanceAfter = await contract.balanceOf(accounts[1])
 
     assert(balanceAfter.eq(balanceBefore.add(mintAmount)), 'Incorrect balance')
+  });
+
+  it("should mint twice (owner)", async () => {
+    const mintAmount = new BN(1000)
+    await contract.setMintAmount(mintAmount)
+
+    const balanceBefore = await contract.balanceOf(accounts[0])
+
+    await contract.mint({ from: accounts[0] })
+    await contract.mint({ from: accounts[0] })
+
+    const balanceAfter = await contract.balanceOf(accounts[0])
+
+    assert(balanceAfter.eq(balanceBefore.add(mintAmount.mul(new BN(2)))), 'Incorrect balance for owner')
   });
 
   it("should mint twice (different accounts)", async () => {

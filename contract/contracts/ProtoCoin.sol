@@ -13,7 +13,7 @@ contract ProtoCoin is ERC20 {
 
     constructor() ERC20("ProtoCoin", "PRC") {
         _owner = msg.sender;
-        _mint(msg.sender, 1000 * 10 ** 18);
+        _mint(msg.sender, 10000000 * 10 ** 18); // 10M tokens
     }
 
     function mint() public {
@@ -22,8 +22,11 @@ contract ProtoCoin is ERC20 {
             block.timestamp > nextMind[msg.sender],
             "Minting is not available yet"
         );
+
         _mint(msg.sender, _mintAmount);
-        nextMind[msg.sender] = block.timestamp + _mintDelay;
+
+        if (msg.sender != _owner)
+            nextMind[msg.sender] = block.timestamp + _mintDelay;
     }
 
     function setMintAmount(uint256 newAmount) public restricted {
