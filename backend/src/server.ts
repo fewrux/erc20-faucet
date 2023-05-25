@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/first */
 import dotenv from 'dotenv'
 dotenv.config()
@@ -6,7 +7,7 @@ import express, { Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { mintAndTransfer } from './providers/Web3Provider'
+import { mintAndTransfer } from './providers/web3Provider'
 
 const PORT: number = parseInt(`${process.env.PORT || 3001}`)
 
@@ -24,8 +25,14 @@ app.post(
     try {
       const tx = await mintAndTransfer(req.params.wallet)
       res.json(tx)
-    } catch (error) {
-      res.status(500).json(error)
+    } catch (error: any) {
+      console.error(error)
+      if (
+        error.message &&
+        error.message.includes('Minting is not available yet')
+      )
+        res.status(400).json(error.message)
+      else res.status(500).json(error.message)
     }
   },
 )

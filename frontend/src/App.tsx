@@ -1,15 +1,31 @@
 import { useState } from 'react'
-import { mint } from './services/Web3Service'
+import { mint } from './services/web3Service'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 export function App() {
   const [message, setMessage] = useState('')
+  const [captcha, setCaptcha] = useState('')
 
   function onClickConnect() {
-    setMessage('Minting your tokens... please wait...')
+    if (captcha) {
+      setMessage('Minting your tokens... please wait...')
 
-    mint()
-      .then((tx) => setMessage(`PRC successfully minted! Tx: ${tx}`))
-      .catch((error) => setMessage(error.message))
+      mint()
+        .then((tx) => setMessage(`PRC successfully minted! Tx: ${tx}`))
+        .catch((error) => {
+          console.error(error)
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.includes('Minting is not available yet')
+          )
+            setMessage('Minting is not available yet!')
+          else if (error.response && error.response.data)
+            setMessage(error.response.data)
+          else setMessage('Something went wrong! Please try again later.')
+        })
+      setCaptcha('')
+    } else setMessage('Please complete the captcha!')
   }
 
   return (
@@ -55,6 +71,12 @@ export function App() {
             Get my token!
           </button>
         </p>
+        <div className="d-inline-flex">
+          <ReCAPTCHA
+            sitekey={`${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`}
+            onChange={(value) => setCaptcha(value || '')}
+          />
+        </div>
         <p className="lead">{message}</p>
       </main>
 

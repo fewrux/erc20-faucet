@@ -20,14 +20,7 @@ const contract = new web3.eth.Contract(
 )
 
 export async function mintAndTransfer(to: string): Promise<string> {
-  const balance = await getBalance()
-
-  if (parseInt(balance) < 1000000000000000000)
-    await contract.methods.mint().send()
-  else contract.methods.mint().send()
-
-  const tx = await contract.methods.transfer(to, '1000000000000000000').send()
-
+  const tx = await contract.methods.mint(to).send()
   return tx.transactionHash
 }
 
