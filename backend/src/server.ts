@@ -19,11 +19,22 @@ app.use(helmet())
 
 app.use(morgan('tiny'))
 
+const nextMint = new Map<string, number>()
+
 app.post(
   '/mint/:wallet',
   async (req: Request, res: Response, next: NextFunction) => {
+    const wallet = req.params.wallet
+    const oneDayInMilliseconds = Date.now() + 1000 * 60 * 60 * 24
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (nextMint.has(wallet) && nextMint.get(wallet)! > Date.now())
+      return res
+        .status(400)
+        .json('Minting is not available yet! Try again tomorrow.')
+
     try {
-      const tx = await mintAndTransfer(req.params.wallet)
+      const tx = await mintAndTransfer(wallet)
       res.json(tx)
     } catch (error: any) {
       console.error(error)
@@ -34,6 +45,8 @@ app.post(
         res.status(400).json(error.message)
       else res.status(500).json(error.message)
     }
+
+    nextMint.set(wallet, oneDayInMilliseconds)
   },
 )
 
