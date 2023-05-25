@@ -8,7 +8,7 @@ export function App() {
     setMessage('Minting your tokens... please wait...')
 
     mint()
-      .then((tx) => setMessage(`PRCs successfully minted! Tx: ${tx}`))
+      .then((tx) => setMessage(`PRC successfully minted! Tx: ${tx}`))
       .catch((error) => setMessage(error.message))
   }
 
@@ -38,8 +38,8 @@ export function App() {
       <main className="px-3">
         <h1>Get your ProtoCoins</h1>
         <p className="lead w-75 mx-auto">
-          Once a day, earn 1.000 PRCs for free just by connecting your MetaMask
-          below.
+          Earn a free <strong>PRC</strong> token everyday just by connecting
+          your MetaMask below.
         </p>
         <p className="lead">
           <button
@@ -52,7 +52,7 @@ export function App() {
               width={48}
               className="me-2"
             />
-            Connect MetaMask
+            Get my token!
           </button>
         </p>
         <p className="lead">{message}</p>
