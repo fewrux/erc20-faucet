@@ -11,18 +11,18 @@ export function App() {
       setMessage('Minting your tokens... please wait...')
 
       mint()
-        .then((tx) => setMessage(`PRC successfully minted! Tx: ${tx}`))
+        .then((tx) =>
+          setMessage(
+            `PRC successfully minted!\nWallet: ${localStorage.getItem(
+              'wallet',
+            )}\nTx: ${tx}`,
+          ),
+        )
         .catch((error) => {
           console.error(error)
-          if (
-            error.response &&
-            error.response.data &&
-            error.response.data.includes('Minting is not available yet')
-          )
-            setMessage('Minting is not available yet!')
-          else if (error.response && error.response.data)
+          if (error.response && error.response.data)
             setMessage(error.response.data)
-          else setMessage('Something went wrong! Please try again later.')
+          else setMessage(error.message)
         })
       setCaptcha('')
     } else setMessage('Please complete the captcha!')
