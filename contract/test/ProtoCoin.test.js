@@ -105,25 +105,25 @@ contract('ProtoCoin', function (accounts) {
     await contract.setMintAmount(mintAmount)
 
     const balanceBefore = await contract.balanceOf(accounts[1])
-    await contract.mint({ from: accounts[1] })
+    await contract.mint(accounts[1], { from: accounts[0] })
     const balanceAfter = await contract.balanceOf(accounts[1])
 
     assert(balanceAfter.eq(balanceBefore.add(mintAmount)), 'Incorrect balance')
   });
 
-  it("should mint twice (owner)", async () => {
-    const mintAmount = new BN(1000)
-    await contract.setMintAmount(mintAmount)
+  // it("should mint twice (owner)", async () => {
+  //   const mintAmount = new BN(1000)
+  //   await contract.setMintAmount(mintAmount)
 
-    const balanceBefore = await contract.balanceOf(accounts[0])
+  //   const balanceBefore = await contract.balanceOf(accounts[0])
 
-    await contract.mint({ from: accounts[0] })
-    await contract.mint({ from: accounts[0] })
+  //   await contract.mint({ from: accounts[0] })
+  //   await contract.mint({ from: accounts[0] })
 
-    const balanceAfter = await contract.balanceOf(accounts[0])
+  //   const balanceAfter = await contract.balanceOf(accounts[0])
 
-    assert(balanceAfter.eq(balanceBefore.add(mintAmount.mul(new BN(2)))), 'Incorrect balance for owner')
-  });
+  //   assert(balanceAfter.eq(balanceBefore.add(mintAmount.mul(new BN(2)))), 'Incorrect balance for owner')
+  // });
 
   it("should mint twice (different accounts)", async () => {
     const mintAmount = new BN(1000)
@@ -131,8 +131,8 @@ contract('ProtoCoin', function (accounts) {
 
     const balanceOneBefore = await contract.balanceOf(accounts[1])
     const balanceTwoBefore = await contract.balanceOf(accounts[2])
-    await contract.mint({ from: accounts[1] })
-    await contract.mint({ from: accounts[2] })
+    await contract.mint(accounts[1], { from: accounts[0] })
+    await contract.mint(accounts[2], { from: accounts[0] })
     const balanceOneAfter = await contract.balanceOf(accounts[1])
     const balanceTwoAfter = await contract.balanceOf(accounts[2])
 
@@ -148,19 +148,30 @@ contract('ProtoCoin', function (accounts) {
     await contract.setMintDelay(delayInSeconds)
 
     const balanceBefore = await contract.balanceOf(accounts[1])
-    await contract.mint({ from: accounts[1] })
+    await contract.mint(accounts[1], { from: accounts[0] })
 
     await time.increase(delayInSeconds * 2)
 
-    await contract.mint({ from: accounts[1] })
+    await contract.mint(accounts[1], { from: accounts[0] })
     const balanceAfter = await contract.balanceOf(accounts[1])
 
     assert(balanceAfter.eq(balanceBefore.add(new BN(mintAmount * 2))), 'Incorrect balance')
   });
 
+  it("should NOT mint (unauthorized)", async () => {
+    await contract.setMintAmount(new BN(1000))
+
+    try {
+      await contract.mint(accounts[1], { from: accounts[1] })
+      assert.fail('the mint should have thrown an error (unauthorized)')
+    } catch (err) {
+      assert.include(err.message, 'revert', 'the mint should have been reverted')
+    }
+  });
+
   it("should NOT mint (disabled)", async () => {
     try {
-      await contract.mint({ from: accounts[1] })
+      await contract.mint(accounts[1], { from: accounts[0] })
       assert.fail('the mint should have thrown an error (disabled)')
     } catch (err) {
       assert.include(err.message, 'revert', 'the mint should have been reverted')
@@ -169,10 +180,10 @@ contract('ProtoCoin', function (accounts) {
 
   it("should NOT mint twice", async () => {
     await contract.setMintAmount(1000)
-    await contract.mint({ from: accounts[1] })
+    await contract.mint(accounts[1], { from: accounts[0] })
 
     try {
-      await contract.mint({ from: accounts[1] })
+      await contract.mint(accounts[1], { from: accounts[0] })
       assert.fail('the mint should have thrown an error (disabled)')
     } catch (err) {
       assert.include(err.message, 'revert', 'the mint should have been reverted')
