@@ -1,5 +1,6 @@
 # ERC-20 Faucet
-> Monorepo for a ERC-20 coin with hybrid backend for Faucet awarding DApp.
+> Monorepo for a ERC-20 coin with hybrid backend for Faucet awarding DApp. <br>
+> > Under development.
 
 <br>
 
